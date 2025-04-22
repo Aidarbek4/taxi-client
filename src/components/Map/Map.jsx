@@ -1,4 +1,3 @@
-// src/components/Map/Map.jsx
 import React, { useState, useEffect } from 'react';
 import {
   MapContainer,
@@ -6,7 +5,7 @@ import {
   Marker,
   Popup,
   Polyline,
-  useMap
+  useMap,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -26,46 +25,53 @@ L.Icon.Default.mergeOptions({
 // Хук для программной центровки карты
 const MapUpdater = ({ center }) => {
   const map = useMap();
-  if (center) map.setView(center, map.getZoom());
+  useEffect(() => {
+    if (center) map.setView(center, map.getZoom());
+  }, [center, map]);
   return null;
 };
 
 const defaultCenter = [42.8776, 74.5998]; // Бишкек
 
 const Map = ({ from, to }) => {
-  const [routeCoords, setRouteCoords] = useState([]);  
+  const [via, setVia] = useState(null);
+  const [routeCoordsList, setRouteCoordsList] = useState([]);
 
   useEffect(() => {
-    // Если обе точки заданы — запрашиваем маршрут
     if (!from || !to) {
-      setRouteCoords([]);
+      setRouteCoordsList([]);
       return;
     }
+
+    const coords = [from, via, to].filter(Boolean);
 
     const fetchRoute = async () => {
       try {
         const url = [
           'https://router.project-osrm.org/route/v1/driving/',
-          `${from[1]},${from[0]};${to[1]},${to[0]}`,
-          '?overview=full&geometries=geojson'
+          coords.map(p => `${p[1]},${p[0]}`).join(';'),
+          '?overview=full&geometries=geojson&alternatives=true'
         ].join('');
 
         const res = await fetch(url);
         const json = await res.json();
+
         if (json.code === 'Ok' && json.routes.length) {
-          // OSRM отдаёт [lng, lat], а leaflet ждёт [lat, lng]
-          const coords = json.routes[0].geometry.coordinates.map(
-            ([lng, lat]) => [lat, lng]
+          const routes = json.routes.map(route =>
+            route.geometry.coordinates.map(([lng, lat]) => [lat, lng])
           );
-          setRouteCoords(coords);
+          setRouteCoordsList(routes);
+        } else {
+          setRouteCoordsList([]);
         }
       } catch (err) {
         console.error('OSRM routing error:', err);
+        setRouteCoordsList([]);
       }
     };
 
     fetchRoute();
-  }, [from, to]);
+  }, [from, to, via]);
 
   return (
     <MapContainer
@@ -74,6 +80,12 @@ const Map = ({ from, to }) => {
       zoom={15}
       attributionControl={false}
       zoomControl={false}
+      whenCreated={(map) => {
+        map.on('click', (e) => {
+          const { lat, lng } = e.latlng;
+          setVia([lat, lng]);
+        });
+      }}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -91,14 +103,21 @@ const Map = ({ from, to }) => {
         </Marker>
       )}
 
-      {routeCoords.length > 0 && (
-        <Polyline
-          positions={routeCoords}
-          color="#FF5500"
-          weight={4}
-          dashArray={null}
-        />
+      {via && (
+        <Marker position={via}>
+          <Popup>Промежуточная точка</Popup>
+        </Marker>
       )}
+
+      {routeCoordsList.map((coords, i) => (
+        <Polyline
+          key={i}
+          positions={coords}
+          color={i === 0 ? '#d4ff00' : '#888'}
+          weight={i === 0 ? 4 : 3}
+          dashArray={i === 0 ? null : '6,6'}
+        />
+      ))}
 
       <MapUpdater center={from} />
     </MapContainer>

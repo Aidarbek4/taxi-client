@@ -46,6 +46,17 @@
         font-weight: 500;
       }
     }
+
+    &__Locator {
+      &__Icon {
+        width: 36px !important;
+        height: 36px !important;
+
+        path {
+          color: #2d3fe0;
+        }
+      }
+    }
   }
 
     .suggestions {

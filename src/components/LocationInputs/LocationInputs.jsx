@@ -2,15 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import MyLocationRoundedIcon from '@mui/icons-material/MyLocationRounded';
 import NearMeRoundedIcon     from '@mui/icons-material/NearMeRounded';
+import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
 import styles from './LocationInputs.module.scss';
 
 const NominatimURL = 'https://nominatim.openstreetmap.org/search?format=json&q=';
 
 const LocationInputs = ({ onFromSelect, onToSelect }) => {
-  const [fromQuery, setFromQuery]           = useState('');
-  const [toQuery,   setToQuery]             = useState('');
+  const [fromQuery, setFromQuery] = useState('');
+  const [toQuery,   setToQuery] = useState('');
   const [fromSuggestions, setFromSuggestions] = useState([]);
-  const [toSuggestions,   setToSuggestions]   = useState([]);
+  const [toSuggestions,   setToSuggestions] = useState([]);
 
   // Debounced fetch
   useEffect(() => {
@@ -56,7 +57,7 @@ const LocationInputs = ({ onFromSelect, onToSelect }) => {
         {/* — Откуда — */}
         <div className={styles.LocationInputs__Input}>
           <label htmlFor="departure" className={styles.LocationInputs__Input__Icon__Wrapper}>
-            <MyLocationRoundedIcon className={styles.LocationInputs__Input__Icon} />
+            <LocationOnRoundedIcon className={styles.LocationInputs__Input__Icon} />
           </label>
           <input
             id="departure"
