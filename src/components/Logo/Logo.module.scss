@@ -1,0 +1,11 @@
+.Logo {
+  display: block;
+  height: 50px;
+  width: 150px;
+  object-fit: cover;
+
+  &Image {
+    width: 100%;
+    height: 100%;
+  }
+}
