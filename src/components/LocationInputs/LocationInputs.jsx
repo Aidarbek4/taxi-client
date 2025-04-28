@@ -1,109 +1,165 @@
-// src/components/LocationInputs.jsx
 import React, { useState, useEffect } from 'react';
-import MyLocationRoundedIcon from '@mui/icons-material/MyLocationRounded';
-import NearMeRoundedIcon     from '@mui/icons-material/NearMeRounded';
-import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
+import axios from 'axios';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import NearMeIcon from '@mui/icons-material/NearMe';
 import styles from './LocationInputs.module.scss';
 
-const NominatimURL = 'https://nominatim.openstreetmap.org/search?format=json&q=';
-
-const LocationInputs = ({ onFromSelect, onToSelect }) => {
-  const [fromQuery, setFromQuery] = useState('');
-  const [toQuery,   setToQuery] = useState('');
-  const [fromSuggestions, setFromSuggestions] = useState([]);
-  const [toSuggestions,   setToSuggestions] = useState([]);
-
-  // Debounced fetch
-  useEffect(() => {
-    if (!fromQuery) return setFromSuggestions([]);
-    const id = setTimeout(async () => {
-      const res  = await fetch(NominatimURL + encodeURIComponent(fromQuery));
-      const json = await res.json();
-      setFromSuggestions(json);
-    }, 300);
-    return () => clearTimeout(id);
-  }, [fromQuery]);
+function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting }) {
+  const [queries, setQueries] = useState({ start: '', end: '' });
+  const [suggestions, setSuggestions] = useState({ start: [], end: [] });
+  const [dropdownsOpen, setDropdownsOpen] = useState({ start: false, end: false });
 
   useEffect(() => {
-    if (!toQuery) return setToSuggestions([]);
-    const id = setTimeout(async () => {
-      const res  = await fetch(NominatimURL + encodeURIComponent(toQuery));
-      const json = await res.json();
-      setToSuggestions(json);
-    }, 300);
-    return () => clearTimeout(id);
-  }, [toQuery]);
+    if (start?.lat && start?.lng) {
+      reverseGeocode(start.lat, start.lng, 'start');
+    }
+  }, [start]);
 
-  const handleSelect = (place, type) => {
-    const lat = parseFloat(place.lat).toFixed(6);
-    const lon = parseFloat(place.lon).toFixed(6);
-    const coords = [ +lat, +lon ];
+  useEffect(() => {
+    if (end?.lat && end?.lng) {
+      reverseGeocode(end.lat, end.lng, 'end');
+    }
+  }, [end]);
 
-    // Вбиваем именно координаты в поле
-    if (type === 'from') {
-      setFromQuery(`${lat}, ${lon}`);
-      setFromSuggestions([]);
-      onFromSelect(coords);
-    } else {
-      setToQuery(`${lat}, ${lon}`);
-      setToSuggestions([]);
-      onToSelect(coords);
+  const reverseGeocode = async (lat, lng, type) => {
+    try {
+      const { data } = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+        params: {
+          lat,
+          lon: lng,
+          format: 'json',
+        },
+      });
+      if (data && data.display_name) {
+        setQueries((q) => ({ ...q, [type]: data.display_name }));
+      } else {
+        setQueries((q) => ({ ...q, [type]: `${lat.toFixed(6)}, ${lng.toFixed(6)}` }));
+      }
+    } catch (error) {
+      console.error('Ошибка при обратном геокодировании:', error);
+      setQueries((q) => ({ ...q, [type]: `${lat.toFixed(6)}, ${lng.toFixed(6)}` }));
     }
   };
 
-  return (
-    <div className={styles.LocationInputs}>
-      <div className={styles.LocationInputsWrapper}>
-        {/* — Откуда — */}
-        <div className={styles.LocationInputs__Input}>
-          <label htmlFor="departure" className={styles.LocationInputs__Input__Icon__Wrapper}>
-            <LocationOnRoundedIcon className={styles.LocationInputs__Input__Icon} />
-          </label>
-          <input
-            id="departure"
-            type="text"
-            placeholder="Откуда"
-            value={fromQuery}
-            onChange={e => setFromQuery(e.target.value)}
-            className={styles.LocationInputs__Input__Field}
-          />
-        </div>
-        {fromSuggestions.length > 0 && (
-          <ul className={styles.suggestions}>
-            {fromSuggestions.map((place, i) => (
-              <li key={i} onClick={() => handleSelect(place, 'from')}>
-                {place.display_name}
-              </li>
-            ))}
-          </ul>
-        )}
+  const fetchSuggestions = async (type, query) => {
+    if (!query) {
+      setSuggestions((s) => ({ ...s, [type]: [] }));
+      return;
+    }
+    try {
+      const { data } = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: { q: query, format: 'json', addressdetails: 1, limit: 5 },
+      });
+      setSuggestions((s) => ({ ...s, [type]: data }));
+    } catch (err) {
+      console.error('Ошибка при получении подсказок:', err);
+    }
+  };
 
-        {/* — Куда — */}
-        <div className={styles.LocationInputs__Input}>
-          <label htmlFor="destination" className={styles.LocationInputs__Input__Icon__Wrapper}>
-            <NearMeRoundedIcon className={styles.LocationInputs__Input__Icon} />
-          </label>
-          <input
-            id="destination"
-            type="text"
-            placeholder="Куда"
-            value={toQuery}
-            onChange={e => setToQuery(e.target.value)}
-            className={styles.LocationInputs__Input__Field}
-          />
+  const parseCoordinates = (input) => {
+    const regex = /^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/;
+    const match = input.match(regex);
+    return match ? { lat: parseFloat(match[1]), lng: parseFloat(match[3]) } : null;
+  };
+
+  const searchAndSetLocation = async (type, query) => {
+    const setter = type === 'start' ? setStart : setEnd;
+    const querySetter = (value) => setQueries((q) => ({ ...q, [type]: value }));
+
+    const coords = parseCoordinates(query);
+    if (coords) {
+      setter(coords);
+      return;
+    }
+
+    try {
+      const { data } = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: { q: query, format: 'json', limit: 1 },
+      });
+      if (data.length > 0) {
+        const place = data[0];
+        setter({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
+        querySetter(place.display_name);
+      }
+    } catch (err) {
+      console.error('Ошибка при поиске местоположения:', err);
+    }
+  };
+
+  const handleInputChange = (e, type) => {
+    const value = e.target.value;
+    setQueries((q) => ({ ...q, [type]: value }));
+    setDropdownsOpen((d) => ({ ...d, [type]: true }));
+    fetchSuggestions(type, value);
+  };
+
+  const handleSelect = (suggestion, type) => {
+    const setter = type === 'start' ? setStart : setEnd;
+    setter({ lat: parseFloat(suggestion.lat), lng: parseFloat(suggestion.lon) });
+    setQueries((q) => ({ ...q, [type]: suggestion.display_name }));
+    setSuggestions((s) => ({ ...s, [type]: [] }));
+    setDropdownsOpen((d) => ({ ...d, [type]: false }));
+  };
+
+  const handleKeyDown = async (e, type) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await searchAndSetLocation(type, queries[type]);
+      setDropdownsOpen((d) => ({ ...d, [type]: false }));
+    }
+  };
+
+  const handleBlur = async (type) => {
+    if (queries[type] && suggestions[type].length === 0) {
+      await searchAndSetLocation(type, queries[type]);
+      setDropdownsOpen((d) => ({ ...d, [type]: false }));
+    }
+  };
+
+  const handleSelectButtonClick = (type, e) => {
+    e.preventDefault();
+    setSelecting(type);
+  };
+
+  return (
+    <div className={styles.Inputs}>
+      {['start', 'end'].map((type) => (
+        <div key={type} className={styles.InputGroup}>
+          <div className={styles.InputWrapper}>
+            <input
+              type="text"
+              placeholder={type === 'start' ? 'Откуда' : 'Куда'}
+              value={queries[type]}
+              onChange={(e) => handleInputChange(e, type)}
+              onKeyDown={(e) => handleKeyDown(e, type)}
+              onBlur={() => handleBlur(type)}
+              onFocus={() => setDropdownsOpen((d) => ({ ...d, [type]: true }))}
+            />
+            {dropdownsOpen[type] && suggestions[type].length > 0 && (
+              <ul className={styles.Suggestions}>
+                {suggestions[type].map((s) => (
+                  <li key={s.place_id} onMouseDown={() => handleSelect(s, type)}>
+                    {s.display_name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button
+            onClick={(e) => handleSelectButtonClick(type, e)}
+            onMouseDown={(e) => e.preventDefault()}
+            className={selecting === type ? styles.ActiveButton : ''}
+          >
+            {type === 'start' ? (
+              <LocationOnIcon fontSize="small" />
+            ) : (
+              <NearMeIcon fontSize="small" />
+            )}
+          </button>
         </div>
-        {toSuggestions.length > 0 && (
-          <ul className={styles.suggestions}>
-            {toSuggestions.map((place, i) => (
-              <li key={i} onClick={() => handleSelect(place, 'to')}>
-                {place.display_name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      ))}
     </div>
   );
-};
+}
 
 export default LocationInputs;

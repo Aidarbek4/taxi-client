@@ -1,127 +1,140 @@
-import React, { useState, useEffect } from 'react';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Polyline,
-  useMap,
-} from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import 'leaflet-routing-machine';
 import styles from './Map.module.scss';
 
-// Настройка стандартных иконок
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Хук для программной центровки карты
-const MapUpdater = ({ center }) => {
+function MapEffect({ start, end, setStart, setEnd, selecting, setSelecting }) {
   const map = useMap();
-  useEffect(() => {
-    if (center) map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
-};
-
-const defaultCenter = [42.8776, 74.5998]; // Бишкек
-
-const Map = ({ from, to }) => {
-  const [via, setVia] = useState(null);
-  const [routeCoordsList, setRouteCoordsList] = useState([]);
+  const routingControlRef = useRef(null);
 
   useEffect(() => {
-    if (!from || !to) {
-      setRouteCoordsList([]);
-      return;
-    }
+    map.setView([42.8746, 74.5698], 13);
+  }, [map]);
 
-    const coords = [from, via, to].filter(Boolean);
-
-    const fetchRoute = async () => {
-      try {
-        const url = [
-          'https://router.project-osrm.org/route/v1/driving/',
-          coords.map(p => `${p[1]},${p[0]}`).join(';'),
-          '?overview=full&geometries=geojson&alternatives=true'
-        ].join('');
-
-        const res = await fetch(url);
-        const json = await res.json();
-
-        if (json.code === 'Ok' && json.routes.length) {
-          const routes = json.routes.map(route =>
-            route.geometry.coordinates.map(([lng, lat]) => [lat, lng])
-          );
-          setRouteCoordsList(routes);
-        } else {
-          setRouteCoordsList([]);
-        }
-      } catch (err) {
-        console.error('OSRM routing error:', err);
-        setRouteCoordsList([]);
+  useEffect(() => {
+    const handleClick = (e) => {
+      const { lat, lng } = e.latlng;
+      if (selecting === 'start') {
+        setStart({ lat, lng });
+        setSelecting(null);
+      } else if (selecting === 'end') {
+        setEnd({ lat, lng });
+        setSelecting(null);
       }
     };
 
-    fetchRoute();
-  }, [from, to, via]);
+    if (selecting) {
+      map.on('click', handleClick);
+    }
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map, selecting, setStart, setEnd, setSelecting]);
+
+  useEffect(() => {
+    if (!start || !end) {
+      if (routingControlRef.current) {
+        map.removeControl(routingControlRef.current);
+        routingControlRef.current = null;
+      }
+      return;
+    }
+
+    if (routingControlRef.current) {
+      map.removeControl(routingControlRef.current);
+    }
+
+    const routingControl = L.Routing.control({
+      waypoints: [
+        L.latLng(start.lat, start.lng),
+        L.latLng(end.lat, end.lng),
+      ],
+      routeWhileDragging: true,
+      lineOptions: {
+        styles: [{ color: '#007bff', weight: 4 }],
+      },
+      show: false,
+      addWaypoints: false,
+      createMarker: () => null,
+      draggableWaypoints: false,
+      router: L.Routing.osrmv1({
+        serviceUrl: 'https://router.project-osrm.org/route/v1',
+      }),
+    }).addTo(map);
+
+    routingControlRef.current = routingControl;
+
+    return () => {
+      if (routingControlRef.current) {
+        map.removeControl(routingControlRef.current);
+        routingControlRef.current = null;
+      }
+    };
+  }, [map, start, end]);
+
+  const handleStartDragEnd = (e) => {
+    const { lat, lng } = e.target.getLatLng();
+    setStart({ lat, lng });
+  };
+
+  const handleEndDragEnd = (e) => {
+    const { lat, lng } = e.target.getLatLng();
+    setEnd({ lat, lng });
+  };
 
   return (
-    <MapContainer
-      className={styles.Map}
-      center={from || defaultCenter}
-      zoom={15}
-      attributionControl={false}
+    <>
+      {start && (
+        <Marker
+          position={[start.lat, start.lng]}
+          draggable={true}
+          eventHandlers={{
+            dragend: handleStartDragEnd,
+          }}
+        >
+          <Popup>Точка отправления</Popup>
+        </Marker>
+      )}
+      {end && (
+        <Marker
+          position={[end.lat, end.lng]}
+          draggable={true}
+          eventHandlers={{
+            dragend: handleEndDragEnd,
+          }}
+        >
+          <Popup>Точка назначения</Popup>
+        </Marker>
+      )}
+    </>
+  );
+}
+
+function Map({ start, end, setStart, setEnd, selecting, setSelecting }) {
+  return (
+    <MapContainer 
+      className={styles.Map} 
+      zoom={13} 
       zoomControl={false}
-      whenCreated={(map) => {
-        map.on('click', (e) => {
-          const { lat, lng } = e.latlng;
-          setVia([lat, lng]);
-        });
-      }}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-
-      {from && (
-        <Marker position={from}>
-          <Popup>Откуда</Popup>
-        </Marker>
-      )}
-
-      {to && (
-        <Marker position={to}>
-          <Popup>Куда</Popup>
-        </Marker>
-      )}
-
-      {via && (
-        <Marker position={via}>
-          <Popup>Промежуточная точка</Popup>
-        </Marker>
-      )}
-
-      {routeCoordsList.map((coords, i) => (
-        <Polyline
-          key={i}
-          positions={coords}
-          color={i === 0 ? '#d4ff00' : '#888'}
-          weight={i === 0 ? 4 : 3}
-          dashArray={i === 0 ? null : '6,6'}
-        />
-      ))}
-
-      <MapUpdater center={from} />
+      <MapEffect
+        start={start}
+        end={end}
+        setStart={setStart}
+        setEnd={setEnd}
+        selecting={selecting}
+        setSelecting={setSelecting}
+      />
     </MapContainer>
   );
-};
+}
 
 export default Map;

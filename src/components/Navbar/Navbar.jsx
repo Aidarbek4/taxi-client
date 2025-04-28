@@ -1,19 +1,17 @@
 import React from 'react'
-import Logo from '../Logo/Logo';
+import Logo from '../Logo/Logo'
 import styles from './Navbar.module.scss'
 
 function Navbar() {
   return (
-    <div className={styles.Navbar}>
-      <nav className={styles.NavbarWrapper}>
-        <ul className={styles.NavbarList}>
-          <li className={styles.NavbarItem}>
-            <Logo />
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <nav className={styles.Navbar}>
+      <ul className={styles.NavbarList}>
+        <li className={styles.NavbarItem}>
+          <Logo />
+        </li>
+      </ul>
+    </nav>
   )
 }
 
-export default Navbar;
+export default Navbar

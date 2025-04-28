@@ -1,6 +1,7 @@
-/* hiding leaflet attribution */
-.leaflet-control-attribution {
-  display: none !important;
+.App {
+  min-height: 100vh;
 }
 
-
+.leaflet-routing-container, .leaflet-control-attribution {
+  display: none !important;
+}
