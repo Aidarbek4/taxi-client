@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NearMeIcon from '@mui/icons-material/NearMe';
+import ClearIcon from '@mui/icons-material/Clear'; // иконка крестика
 import styles from './LocationInputs.module.scss';
 
 function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting }) {
   const [queries, setQueries] = useState({ start: '', end: '' });
   const [suggestions, setSuggestions] = useState({ start: [], end: [] });
   const [dropdownsOpen, setDropdownsOpen] = useState({ start: false, end: false });
+
+  const wrapperRef = useRef(null);
 
   useEffect(() => {
     if (start?.lat && start?.lng) {
@@ -21,16 +24,36 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
     }
   }, [end]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setDropdownsOpen({ start: false, end: false });
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setDropdownsOpen({ start: false, end: false });
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
   const reverseGeocode = async (lat, lng, type) => {
     try {
       const { data } = await axios.get('https://nominatim.openstreetmap.org/reverse', {
-        params: {
-          lat,
-          lon: lng,
-          format: 'json',
-        },
+        params: { lat, lon: lng, format: 'json' },
       });
-      if (data && data.display_name) {
+      if (data?.display_name) {
         setQueries((q) => ({ ...q, [type]: data.display_name }));
       } else {
         setQueries((q) => ({ ...q, [type]: `${lat.toFixed(6)}, ${lng.toFixed(6)}` }));
@@ -89,8 +112,24 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
   const handleInputChange = (e, type) => {
     const value = e.target.value;
     setQueries((q) => ({ ...q, [type]: value }));
-    setDropdownsOpen((d) => ({ ...d, [type]: true }));
-    fetchSuggestions(type, value);
+
+    if (value.trim() === '') {
+      if (type === 'start') setStart(null);
+      else setEnd(null);
+      setSuggestions((s) => ({ ...s, [type]: [] }));
+      setDropdownsOpen((d) => ({ ...d, [type]: false }));
+    } else {
+      fetchSuggestions(type, value);
+      setDropdownsOpen((d) => ({ ...d, [type]: true }));
+    }
+  };
+
+  const handleClear = (type) => {
+    setQueries((q) => ({ ...q, [type]: '' }));
+    if (type === 'start') setStart(null);
+    else setEnd(null);
+    setSuggestions((s) => ({ ...s, [type]: [] }));
+    setDropdownsOpen((d) => ({ ...d, [type]: false }));
   };
 
   const handleSelect = (suggestion, type) => {
@@ -110,10 +149,12 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
   };
 
   const handleBlur = async (type) => {
-    if (queries[type] && suggestions[type].length === 0) {
-      await searchAndSetLocation(type, queries[type]);
+    setTimeout(async () => {
+      if (queries[type] && suggestions[type].length === 0) {
+        await searchAndSetLocation(type, queries[type]);
+      }
       setDropdownsOpen((d) => ({ ...d, [type]: false }));
-    }
+    }, 100);
   };
 
   const handleSelectButtonClick = (type, e) => {
@@ -122,19 +163,35 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
   };
 
   return (
-    <div className={styles.Inputs}>
+    <div className={styles.Inputs} ref={wrapperRef}>
       {['start', 'end'].map((type) => (
         <div key={type} className={styles.InputGroup}>
           <div className={styles.InputWrapper}>
             <input
               type="text"
-              placeholder={type === 'start' ? 'Откуда' : 'Куда'}
+              placeholder={type === 'start' ? 'Откуда' : 'Куда'
+              }
               value={queries[type]}
               onChange={(e) => handleInputChange(e, type)}
               onKeyDown={(e) => handleKeyDown(e, type)}
               onBlur={() => handleBlur(type)}
-              onFocus={() => setDropdownsOpen((d) => ({ ...d, [type]: true }))}
+              onFocus={() => {
+                if (queries[type]) {
+                  fetchSuggestions(type, queries[type]);
+                  setDropdownsOpen((d) => ({ ...d, [type]: true }));
+                }
+              }}
             />
+            {queries[type] && (
+              <button
+                type="button"
+                className={styles.ClearButton}
+                onClick={() => handleClear(type)}
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <ClearIcon fontSize="small" />
+              </button>
+            )}
             {dropdownsOpen[type] && suggestions[type].length > 0 && (
               <ul className={styles.Suggestions}>
                 {suggestions[type].map((s) => (
@@ -150,11 +207,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
             onMouseDown={(e) => e.preventDefault()}
             className={selecting === type ? styles.ActiveButton : ''}
           >
-            {type === 'start' ? (
-              <LocationOnIcon fontSize="small" />
-            ) : (
-              <NearMeIcon fontSize="small" />
-            )}
+            {type === 'start' ? <LocationOnIcon /> : <NearMeIcon />}
           </button>
         </div>
       ))}
