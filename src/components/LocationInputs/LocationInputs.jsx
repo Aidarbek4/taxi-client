@@ -2,13 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NearMeIcon from '@mui/icons-material/NearMe';
-import ClearIcon from '@mui/icons-material/Clear'; // иконка крестика
+import ClearIcon from '@mui/icons-material/Clear';
+import { TextField, IconButton } from '@mui/material';
 import styles from './LocationInputs.module.scss';
 
-function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting }) {
+function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting, onSelectLocation }) {
   const [queries, setQueries] = useState({ start: '', end: '' });
   const [suggestions, setSuggestions] = useState({ start: [], end: [] });
   const [dropdownsOpen, setDropdownsOpen] = useState({ start: false, end: false });
+  const [isLoading, setIsLoading] = useState({ start: false, end: false });
+  const [error, setError] = useState({ start: null, end: null });
 
   const wrapperRef = useRef(null);
 
@@ -31,9 +34,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -43,9 +44,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
       }
     };
     document.addEventListener('keydown', handleEsc);
-    return () => {
-      document.removeEventListener('keydown', handleEsc);
-    };
+    return () => document.removeEventListener('keydown', handleEsc);
   }, []);
 
   const reverseGeocode = async (lat, lng, type) => {
@@ -159,58 +158,125 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
 
   const handleSelectButtonClick = (type, e) => {
     e.preventDefault();
+    if (onSelectLocation) onSelectLocation(type);
     setSelecting(type);
   };
 
   return (
-    <div className={styles.Inputs} ref={wrapperRef}>
-      {['start', 'end'].map((type) => (
-        <div key={type} className={styles.InputGroup}>
-          <div className={styles.InputWrapper}>
-            <input
-              type="text"
-              placeholder={type === 'start' ? 'Откуда' : 'Куда'
+    <div className={styles.locationInputs} ref={wrapperRef}>
+      <div className={styles.formGroup}>
+        {/* <label>Место отправки:</label> */}
+        <div className={styles.inputContainer}>
+          <TextField
+            fullWidth
+            placeholder="Откуда?"
+            value={queries.start}
+            onChange={(e) => handleInputChange(e, 'start')}
+            onKeyDown={(e) => handleKeyDown(e, 'start')}
+            onBlur={() => handleBlur('start')}
+            onFocus={() => {
+              if (queries.start) {
+                fetchSuggestions('start', queries.start);
+                setDropdownsOpen((d) => ({ ...d, start: true }));
               }
-              value={queries[type]}
-              onChange={(e) => handleInputChange(e, type)}
-              onKeyDown={(e) => handleKeyDown(e, type)}
-              onBlur={() => handleBlur(type)}
-              onFocus={() => {
-                if (queries[type]) {
-                  fetchSuggestions(type, queries[type]);
-                  setDropdownsOpen((d) => ({ ...d, [type]: true }));
-                }
-              }}
-            />
-            {queries[type] && (
-              <button
-                type="button"
-                className={styles.ClearButton}
-                onClick={() => handleClear(type)}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <ClearIcon fontSize="small" />
-              </button>
-            )}
-            {dropdownsOpen[type] && suggestions[type].length > 0 && (
-              <ul className={styles.Suggestions}>
-                {suggestions[type].map((s) => (
-                  <li key={s.place_id} onMouseDown={() => handleSelect(s, type)}>
-                    {s.display_name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <button
-            onClick={(e) => handleSelectButtonClick(type, e)}
-            onMouseDown={(e) => e.preventDefault()}
-            className={selecting === type ? styles.ActiveButton : ''}
-          >
-            {type === 'start' ? <LocationOnIcon /> : <NearMeIcon />}
-          </button>
+            }}
+            className={`${styles.input} ${error.start ? styles.error : ''}`}
+            InputProps={{
+              endAdornment: (
+                <>
+                  {queries.start && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleClear('start')}
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    size="small"
+                    className={selecting === 'start' ? styles.active : ''}
+                    onClick={(e) => handleSelectButtonClick('start', e)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <LocationOnIcon />
+                  </IconButton>
+                </>
+              ),
+            }}
+            error={!!error.start}
+            helperText={error.start}
+          />
         </div>
-      ))}
+        {dropdownsOpen.start && suggestions.start.length > 0 && (
+          <ul className={styles.suggestions}>
+            {suggestions.start.map((s) => (
+              <li key={s.place_id} onMouseDown={() => handleSelect(s, 'start')}>
+                <LocationOnIcon />
+                <span>{s.display_name}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {error.start && <div className={styles.errorMessage}>{error.start}</div>}
+      </div>
+
+      <div className={styles.formGroup}>
+        {/* <label>Место назначения:</label> */}
+        <div className={styles.inputContainer}>
+          <TextField
+            fullWidth
+            placeholder="Куда?"
+            value={queries.end}
+            onChange={(e) => handleInputChange(e, 'end')}
+            onKeyDown={(e) => handleKeyDown(e, 'end')}
+            onBlur={() => handleBlur('end')}
+            onFocus={() => {
+              if (queries.end) {
+                fetchSuggestions('end', queries.end);
+                setDropdownsOpen((d) => ({ ...d, end: true }));
+              }
+            }}
+            className={`${styles.input} ${error.end ? styles.error : ''}`}
+            InputProps={{
+              endAdornment: (
+                <>
+                  {queries.end && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleClear('end')}
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    size="small"
+                    className={selecting === 'end' ? styles.active : ''}
+                    onClick={(e) => handleSelectButtonClick('end', e)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <NearMeIcon />
+                  </IconButton>
+                </>
+              ),
+            }}
+            error={!!error.end}
+            helperText={error.end}
+          />
+        </div>
+        {dropdownsOpen.end && suggestions.end.length > 0 && (
+          <ul className={styles.suggestions}>
+            {suggestions.end.map((s) => (
+              <li key={s.place_id} onMouseDown={() => handleSelect(s, 'end')}>
+                <NearMeIcon />
+                <span>{s.display_name}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {error.end && <div className={styles.errorMessage}>{error.end}</div>}
+      </div>
     </div>
   );
 }

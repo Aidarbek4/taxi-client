@@ -1,0 +1,96 @@
+// Color variables
+$primary-blue: #0F4F8D;
+$accent-yellow: #FFDD2D;
+$background-gray: #f1f5f9;
+$text-gray: #666;
+$text-dark: #1a1a1a;
+$shadow-gray: rgba(0, 0, 0, 0.1);
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background-gray;
+  width: 375px;
+  margin: 0 auto;
+  overflow-y: auto;
+
+  @media (max-width: 375px) {
+    width: 100%;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px $shadow-gray;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.submitButton {
+  background-color: $primary-blue;
+  color: white;
+  padding: 0; // Remove padding to control size with width/height
+  width: 155px;
+  height: 31px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: darken($primary-blue, 10%);
+  }
+}
+
+.profileIcon {
+  color: $primary-blue; // Changed to blue instead of gray
+
+  svg {
+    font-size: 24px;
+    fill: $primary-blue !important; // Ensure the SVG fill is also blue
+  }
+}
+
+.formContainer {
+  padding: 20px;
+  background: #fff;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 2px 4px $shadow-gray;
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: $text-dark;
+  }
+}
+
+.mapContainer {
+  width: 100%;
+  height: 50vh;
+  position: relative;
+
+  @media (max-width: 768px) {
+    height: 40vh;
+  }
+
+  .Map {
+    height: 100%;
+    width: 100%;
+  }
+}
