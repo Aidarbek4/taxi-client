@@ -16,13 +16,19 @@ $hover-blue: rgba(15, 79, 141, 0.7);
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 10px 0;
-  height: 0;
+  max-width: 375px;
+  // margin: 0 auto;
+  padding-left: 14px;
+  position: absolute;
+  top: 14px;
+  // left: 50%;
+  // transform: translateX(-50%);
+  // z-index: 5;
+  // background-color: transparent;
+  // border-radius: 0;
 
-  @media (max-width: 628px) { // 600 + 14 + 14 = 628px
-    width: calc(100% - 28px); // Adjust for 14px margins on both sides
+  @media (max-width: 500px) {
+    width: calc(100% - 16px);
     max-width: none;
   }
 }
