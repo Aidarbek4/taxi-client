@@ -1,12 +1,15 @@
-@use "sass:color";
-
 // Цвета
 $primary-blue: #0F4F8D;
 $accent-yellow: #FFDD2D;
 $background-gray: #f1f5f9;
-$text-gray: #666;
+$accent-yellow: #FFDD2D;
+$gray: #696969;
 $text-dark: #1a1a1a;
 $shadow-gray: rgba(0, 0, 0, 0.1);
+$primary-blue: #0F4F8D;
+$accent-yellow: #FFDD2D;
+$accent-green: #8BC97E;
+$input-focus: #0053A0;
 
 // Глобальные стили
 * {

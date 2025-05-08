@@ -46,7 +46,7 @@ const RequestForm = () => {
 
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit} className={styles.requestForm}>
-          <label className={styles.label}>Цель поездки:</label>
+          <label className={styles.label}>Введите цель поездки:</label>
           <TextField
             className={styles.inputField}
             placeholder="Деловая встреча"
@@ -54,9 +54,6 @@ const RequestForm = () => {
             onChange={handleChange}
             fullWidth
             margin="normal"
-            InputProps={{
-              style: { borderRadius: '10px' },
-            }}
           />
 
           <label className={styles.label}>Дата поездки:</label>
@@ -68,7 +65,7 @@ const RequestForm = () => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  className={styles.inputField}
+                  className={styles.icons}
                   InputProps={{
                     endAdornment: (
                       <IconButton>
@@ -88,10 +85,7 @@ const RequestForm = () => {
             value={formData.departure}
             onChange={handleChange}
             fullWidth
-            margin="normal"
-            InputProps={{
-              style: { borderRadius: '10px' },
-            }}
+            margin="20px"
           />
 
           <label className={styles.label}>Место назначения:</label>
@@ -102,9 +96,6 @@ const RequestForm = () => {
             onChange={handleChange}
             fullWidth
             margin="normal"
-            InputProps={{
-              style: { borderRadius: '10px' },
-            }}
           />
 
           <label className={styles.label}>Время отправки:</label>
@@ -117,7 +108,7 @@ const RequestForm = () => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  className={styles.inputField}
+                  className={styles.icons}
                   InputProps={{
                     endAdornment: (
                       <IconButton>

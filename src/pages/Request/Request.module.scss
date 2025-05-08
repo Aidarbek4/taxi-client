@@ -1,20 +1,13 @@
 @use "sass:color";
-
-// Общие переменные
-$primary-blue: #0053A0;
-$input-border: #ccc;
-$input-focus: #0053A0;
-$text-gray: #555;
-$text-light: #666;
+@import "../../components/styles.scss";
 
 .dashboard {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #fff; // Белый фон вместо серого
+  height: 100vh;
+  background-color: #fff; 
   width: 375px;
   margin: 0 auto;
-  overflow-y: auto;
 
   @media (max-width: 500px) {
     width: 100%;
@@ -25,62 +18,55 @@ $text-light: #666;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 17px 14px 8px;
   background-color: #fff;
-  box-shadow: none; // Убираем тень
   position: sticky;
   top: 0;
   z-index: 10;
 
   h1 {
-    font-size: 20px;
+    font-size: 27px;
     color: $primary-blue;
-    margin-bottom: 20px;
-    text-align: left; // Выравнивание заголовка слева
+    font-weight: 400;
+    text-align: left; 
   }
 }
 
 .formContainer {
   background: #fff;
-  border-radius: 0 0 20px 20px;
-  box-shadow: none; // Убираем тень
   position: relative;
   z-index: 2;
-  padding: 20px;
+  padding: 14px;
 }
 
 .requestForm {
   display: flex;
   flex-direction: column;
-  gap: 22.47px; // Точный отступ между элементами
 
   .label {
-    font-size: 14px;
-    color: $text-light;
-    margin-bottom: 5px;
-    font-weight: 500; // Полужирный текст для меток
+    font-size: 16px;
+    color: $gray;
+    margin-bottom: 10px;
+    font-weight: 500;
   }
 
-  input,
   .MuiInputBase-root {
-    width: 348px !important; // Точная ширина
-    height: 56.32px !important; // Точная высота
-    border: 1px solid $input-border;
-    border-radius: 10px;
+    width: 348px; 
+    height: 56.32px; 
+    border: 1px solid $gray;
+    border-radius: 17px;
     font-size: 16px;
     box-sizing: border-box;
-    padding: 12px;
-    margin-bottom: 5px; // Убираем лишние отступы
+    padding: 10px;
 
     &:focus {
-      outline: none;
       border-color: $input-focus;
-      box-shadow: 0 0 0 2px rgba(0, 83, 160, 0.2); // Тень при фокусе
+      box-shadow: 0 0 0 2px rgba(0, 83, 160, 0.2); 
     }
   }
 
   .MuiFormControl-root {
-    margin: 0; // Убираем стандартные отступы MUI
+    margin: 0; 
   }
 
   .addRouteButton {
@@ -93,44 +79,43 @@ $text-light: #666;
     text-align: center;
 
     .MuiIconButton-root {
-      width: 48px;
-      height: 48px;
-      border: 2px dashed $primary-blue;
+      width: 24px;
+      height: 24px;
+      border: 1px dashed $primary-blue;
       background-color: rgba(0, 83, 160, 0.1);
       color: $primary-blue;
       border-radius: 50%;
       transition: transform 0.2s;
 
       &:hover {
-        transform: scale(1.1);
+        fill: $accent-green;
+        color: white;
       }
     }
 
     p {
-      font-size: 12px;
-      color: $text-gray;
-      margin: 0;
-      max-width: 250px;
+      font-size: 16px;
+      color: $gray;
     }
   }
 
   button {
     background-color: $primary-blue;
     color: white;
-    padding: 14px;
+    padding: 10px;
     border: none;
-    border-radius: 10px;
+    border-radius: 17px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-    width: 348px !important;
-    height: 56.32px !important;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    width: 348px ;
+    height: 56.32px ;
+    font-weight: 400;
+    // text-transform: uppercase;
+    // letter-spacing: 0.5px;
 
     &:hover {
-      background-color: darken($primary-blue, 10%); // Темнее на 10%
+      background-color: darken($primary-blue, 10%); 
     }
   }
 }

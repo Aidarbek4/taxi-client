@@ -1,14 +1,5 @@
 @use "sass:color";
-$primary-blue: #0F4F8D;
-$accent-yellow: #FFDD2D;
-$background-gray: #f1f5f9;
-$text-gray: #666;
-$text-dark: #1a1a1a;
-$shadow-gray: rgba(0, 0, 0, 0.1);
-
-* {
-  font-family: "Nunito", sans-serif;
-}
+@import "../../components/styles.scss";
 
 .dashboard {
   display: flex;
