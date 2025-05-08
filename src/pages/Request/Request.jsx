@@ -1,101 +1,154 @@
 import React, { useState } from 'react';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { ruRU } from '@mui/x-date-pickers/locales';
-import { ru } from 'date-fns/locale';
-import { TextField } from '@mui/material';
+import dayjs from 'dayjs';
 import styles from './Request.module.scss';
 
-function Request() {
-  const [tripDate, setTripDate] = useState(null);
-  const [tripTime, setTripTime] = useState(null);
-  const [tripPurpose, setTripPurpose] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+const RequestForm = () => {
+  const [formData, setFormData] = useState({
+    purpose: '',
+    date: null,
+    departure: '',
+    destination: '',
+    time: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (newDate) => {
+    setFormData(prev => ({ ...prev, date: newDate?.toDate() || null }));
+  };
+
+  const handleTimeChange = (newTime) => {
+    setFormData(prev => ({ ...prev, time: newTime?.format('HH:mm') || '' }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!tripDate || !tripTime || !tripPurpose) {
-      alert('Пожалуйста, заполните все поля');
-      return;
-    }
-    setIsSubmitted(true);
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-      setTripDate(null);
-      setTripTime(null);
-      setTripPurpose('');
-      setIsSubmitted(false);
-    }, 3000);
+    console.log('Submitted:', formData);
   };
 
-  if (showSuccessMessage) {
-    return (
-      <div className={styles.successMessage}>
-        <div className={styles.successIcon}>✓</div>
-        <h2>ЗАЯВКА ОТПРАВЛЕНА</h2>
-        <p>Заявка находится в обработке. Вы будете перенаправлены на главную страницу в течение нескольких секунд.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.requestPage}>
+    <div className={styles.dashboard}>
+      <header className={styles.header}>
+        <h1>Заявка</h1>
+      </header>
+
       <div className={styles.formContainer}>
-        <h2>Заявка</h2>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label>Введите цель поездки:</label>
-            <TextField
-              fullWidth
-              value={tripPurpose}
-              onChange={(e) => setTripPurpose(e.target.value)}
-              placeholder="Деловая встреча"
-              className={styles.input}
+        <form onSubmit={handleSubmit} className={styles.requestForm}>
+          <label className={styles.label}>Цель поездки:</label>
+          <TextField
+            className={styles.inputField}
+            placeholder="Деловая встреча"
+            value={formData.purpose}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            InputProps={{
+              style: { borderRadius: '10px' },
+            }}
+          />
+
+          <label className={styles.label}>Дата поездки:</label>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Дата"
+              value={formData.date ? dayjs(formData.date) : null}
+              onChange={handleDateChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={styles.inputField}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton>
+                        <AccessTimeIcon color="primary" />
+                      </IconButton>
+                    ),
+                  }}
+                />
+              )}
             />
+          </LocalizationProvider>
+
+          <label className={styles.label}>Место отправки:</label>
+          <TextField
+            className={styles.inputField}
+            placeholder="Откуда?"
+            value={formData.departure}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            InputProps={{
+              style: { borderRadius: '10px' },
+            }}
+          />
+
+          <label className={styles.label}>Место назначения:</label>
+          <TextField
+            className={styles.inputField}
+            placeholder="Куда?"
+            value={formData.destination}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            InputProps={{
+              style: { borderRadius: '10px' },
+            }}
+          />
+
+          <label className={styles.label}>Время отправки:</label>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <TimePicker
+              label="Время"
+              value={formData.time ? dayjs(formData.time, 'HH:mm') : null}
+              onChange={handleTimeChange}
+              views={['hours', 'minutes']}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  className={styles.inputField}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton>
+                        <AccessTimeIcon color="primary" />
+                      </IconButton>
+                    ),
+                  }}
+                />
+              )}
+            />
+          </LocalizationProvider>
+
+          <div className={styles.addRouteButton}>
+            <IconButton>
+              <AddIcon fontSize="large" color="primary" />
+            </IconButton>
+            <p>Нажмите +, чтобы добавить еще один маршрут поездки</p>
           </div>
 
-          <div className={styles.formGroup}>
-            <label>Выберите дату поездки:</label>
-            <LocalizationProvider
-              dateAdapter={AdapterDateFns}
-              adapterLocale={ru}
-              localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
-            >
-              <DatePicker
-                value={tripDate}
-                onChange={setTripDate}
-                minDate={new Date()}
-                slotProps={{ textField: { className: styles.input } }}
-              />
-            </LocalizationProvider>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Время отправки:</label>
-            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-              <TimePicker
-                value={tripTime}
-                onChange={setTripTime}
-                slotProps={{ textField: { className: styles.input } }}
-              />
-            </LocalizationProvider>
-          </div>
-
-          <button
+          <Button
             type="submit"
             className={styles.submitButton}
-            disabled={isSubmitted}
+            variant="contained"
+            fullWidth
           >
-            {isSubmitted ? 'Отправка...' : 'Подать заявку'}
-          </button>
+            Подать заявку
+          </Button>
         </form>
       </div>
     </div>
   );
-}
+};
 
-export default Request;
+export default RequestForm;

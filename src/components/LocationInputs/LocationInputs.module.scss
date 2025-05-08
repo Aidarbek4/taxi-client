@@ -1,4 +1,4 @@
-// Color variables
+@use "sass:color";
 $primary-blue: #0F4F8D;
 $accent-yellow: #FFDD2D;
 $background-gray: #f1f5f9;
@@ -17,10 +17,11 @@ $hover-blue: rgba(15, 79, 141, 0.7);
   gap: 10px;
   width: 100%;
   max-width: 375px;
+  padding: 10px 0 0 14px;
   // margin: 0 auto;
-  padding-left: 14px;
+  // padding: 10px 14px;
   position: absolute;
-  top: 14px;
+  // top: 34px;
   // left: 50%;
   // transform: translateX(-50%);
   // z-index: 5;
@@ -215,7 +216,7 @@ button {
   font-size: 1rem;
 
   &:hover {
-    background-color: darken($primary-blue, 10%);
+    background-color: color.adjust($primary-blue, $lightness: -10%);
   }
 
   &:focus {

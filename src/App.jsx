@@ -5,8 +5,9 @@ import Register from './pages/Register/Register'
 import Login from './pages/Login/Login'
 import './App.scss'
 import Welcome from './pages/Welcome/Welcome'
-// import Request from './pages/Request/Request'
+import Request from './pages/Request/Request'
 import ClientDashboard from './pages/Client/ClientDashboard'
+import AddTrip from './pages/AddTrip/AddTrip'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -18,7 +19,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/client" element={<ClientDashboard />} />
-        {/* <Route path="/request" element={<Request />} /> */}
+        <Route path="/request" element={<Request />} />
+        <Route path="/add-trip" element={<AddTrip />} />
       </Routes>
     </div>
   )

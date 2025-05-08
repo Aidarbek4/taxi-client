@@ -17,11 +17,11 @@ function ClientDashboard() {
   };
 
   const handleSubmit = () => {
-    if (!start || !end) {
-      alert('Пожалуйста, выберите места отправки и назначения');
-      return;
-    }
-    navigate('/request', { state: { start, end } });
+    // Navigate to /request with today's date, even if fields are not filled
+    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD (2025-05-08)
+    setTimeout(() => {
+      navigate('/request', { state: { start, end, date: today, time: null } });
+    }, 300);
   };
 
   return (

@@ -1,0 +1,17 @@
+@use "sass:color";
+
+// Цвета
+$primary-blue: #0F4F8D;
+$accent-yellow: #FFDD2D;
+$background-gray: #f1f5f9;
+$text-gray: #666;
+$text-dark: #1a1a1a;
+$shadow-gray: rgba(0, 0, 0, 0.1);
+
+// Глобальные стили
+* {
+  font-family: "Nunito", sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

@@ -1,4 +1,4 @@
-// Color variables
+@use "sass:color";
 $primary-blue: #0F4F8D;
 $accent-yellow: #FFDD2D;
 $background-gray: #f1f5f9;
@@ -53,12 +53,12 @@ $shadow-gray: rgba(0, 0, 0, 0.1);
   justify-content: center;
 
   &:hover {
-    background-color: darken($primary-blue, 10%);
+    background-color: color.adjust($primary-blue, $lightness: -10%);
   }
 }
 
 .profileIcon {
-  color: $primary-blue; // Changed to blue instead of gray
+  color: $primary-blue;
 
   svg {
     font-size: 30px;

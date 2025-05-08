@@ -1,0 +1,82 @@
+@use "sass:color";
+
+$primary-blue: #0F4F8D;
+$modal-green: #8BC97E;
+$modal-gray: #98A4B8;
+$background-gray: #f1f5f9;
+$text-dark: #1a1a1a;
+$shadow-gray: rgba(0, 0, 0, 0.1);
+
+.addTripContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $background-gray;
+  padding: 20px;
+  font-family: "Nunito", sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: $text-dark;
+  margin-bottom: 20px;
+}
+
+.dateTimeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 375px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dateInput, .timeInput {
+  width: 100%;
+
+  .MuiInputBase-root {
+    background-color: white;
+    border-radius: 4px;
+
+    input {
+      color: $text-dark;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $modal-gray;
+    }
+
+    &:hover .MuiOutlinedInput-notchedOutline {
+      border-color: $modal-gray;
+    }
+
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: $primary-blue;
+    }
+  }
+
+  .MuiInputLabel-root {
+    color: $text-dark;
+
+    &.Mui-focused {
+      color: $primary-blue;
+    }
+  }
+}
+
+.confirmButton {
+  background-color: $modal-green;
+  color: white;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 4px;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: color.adjust($modal-green, $lightness: -10%);
+  }
+}
