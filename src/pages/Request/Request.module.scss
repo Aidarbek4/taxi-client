@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #fff; 
+  background-color: #fff;
   width: 375px;
   margin: 0 auto;
 
@@ -28,7 +28,7 @@
     font-size: 27px;
     color: $primary-blue;
     font-weight: 400;
-    text-align: left; 
+    text-align: left;
   }
 }
 
@@ -42,80 +42,97 @@
 .requestForm {
   display: flex;
   flex-direction: column;
+  gap: 22.47px;
+
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
   .label {
     font-size: 16px;
     color: $gray;
-    margin-bottom: 10px;
-    font-weight: 500;
+    margin: 0;
   }
 
-  .MuiInputBase-root {
-    width: 348px; 
-    height: 56.32px; 
+  .inputField {
+    width: 348px;
+    height: 56.32px;
     border: 1px solid $gray;
-    border-radius: 17px;
+    border-radius: 10px;
     font-size: 16px;
     box-sizing: border-box;
     padding: 10px;
+    background-color: white;
+
+    .MuiFormControl-root-MuiPickersTextField-root,
+    .MuiPickersInputBase-root.MuiPickersOutlinedInput-root{
+      border-radius: 17px;
+    }
 
     &:focus {
-      border-color: $input-focus;
-      box-shadow: 0 0 0 2px rgba(0, 83, 160, 0.2); 
+      border-color: $primary-blue;
+      box-shadow: 0 0 0 2px rgba(0, 83, 160, 0.2);
     }
-  }
-
-  .MuiFormControl-root {
-    margin: 0; 
   }
 
   .addRouteButton {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 11px;
+    margin-top: 19px;
     flex-direction: column;
     text-align: center;
 
-    .MuiIconButton-root {
-      width: 24px;
-      height: 24px;
-      border: 1px dashed $primary-blue;
+    .addRoutePlus {
+      width: 47px;
+      height: 41px;
+      border: 1px solid $primary-blue;
       background-color: rgba(0, 83, 160, 0.1);
       color: $primary-blue;
-      border-radius: 50%;
-      transition: transform 0.2s;
+      border-radius: 17px;
+      transition: transform 0.2s, background-color 0.3s, color 0.3s;
 
       &:hover {
-        fill: $accent-green;
+        background-color: $accent-green;
         color: white;
+        border-color: $accent-green;
+
+        svg {
+          fill: white;
+        }
+      }
+
+      svg {
+        font-size: 24px;
       }
     }
 
     p {
-      font-size: 16px;
+      font-size: 14px;
       color: $gray;
     }
   }
 
-  button {
+  .submitButton {
     background-color: $primary-blue;
     color: white;
-    padding: 10px;
+    padding: 12px;
     border: none;
     border-radius: 17px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-    width: 348px ;
-    height: 56.32px ;
+    width: 348px;
+    height: 56.32px;
     font-weight: 400;
     // text-transform: uppercase;
     // letter-spacing: 0.5px;
 
     &:hover {
-      background-color: darken($primary-blue, 10%); 
+      background-color: color.adjust($primary-blue, $lightness: -10%);
     }
   }
 }

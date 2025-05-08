@@ -46,83 +46,95 @@ const RequestForm = () => {
 
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit} className={styles.requestForm}>
-          <label className={styles.label}>Введите цель поездки:</label>
-          <TextField
-            className={styles.inputField}
-            placeholder="Деловая встреча"
-            value={formData.purpose}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-
-          <label className={styles.label}>Дата поездки:</label>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Дата"
-              value={formData.date ? dayjs(formData.date) : null}
-              onChange={handleDateChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className={styles.icons}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton>
-                        <AccessTimeIcon color="primary" />
-                      </IconButton>
-                    ),
-                  }}
-                />
-              )}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Введите цель поездки:</label>
+            <TextField
+              className={styles.inputField}
+              placeholder="Деловая встреча"
+              name="purpose"
+              value={formData.purpose}
+              onChange={handleChange}
+              fullWidth
+              margin="none"
+              variant="standard"
+              border="none"
+              InputProps={{ disableUnderline: true }}
             />
-          </LocalizationProvider>
+          </div>
 
-          <label className={styles.label}>Место отправки:</label>
-          <TextField
-            className={styles.inputField}
-            placeholder="Откуда?"
-            value={formData.departure}
-            onChange={handleChange}
-            fullWidth
-            margin="20px"
-          />
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Дата поездки:</label>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Дата"
+                value={formData.date ? dayjs(formData.date) : null}
+                onChange={handleDateChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    className={styles.inputField}
+                  
+                    InputProps={{ disableUnderline: true }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </div>
 
-          <label className={styles.label}>Место назначения:</label>
-          <TextField
-            className={styles.inputField}
-            placeholder="Куда?"
-            value={formData.destination}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-
-          <label className={styles.label}>Время отправки:</label>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <TimePicker
-              label="Время"
-              value={formData.time ? dayjs(formData.time, 'HH:mm') : null}
-              onChange={handleTimeChange}
-              views={['hours', 'minutes']}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className={styles.icons}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton>
-                        <AccessTimeIcon color="primary" />
-                      </IconButton>
-                    ),
-                  }}
-                />
-              )}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Место отправки:</label>
+            <TextField
+              className={styles.inputField}
+              placeholder="Откуда?"
+              name="departure"
+              value={formData.departure}
+              onChange={handleChange}
+              fullWidth
+              margin="none"
+              variant="standard"
+              border="none"
+              InputProps={{ disableUnderline: true }}
             />
-          </LocalizationProvider>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Место назначения:</label>
+            <TextField
+              className={styles.inputField}
+              placeholder="Куда?"
+              name="destination"
+              value={formData.destination}
+              onChange={handleChange}
+              fullWidth
+              margin="none"
+              variant="standard"
+              border="none"
+              InputProps={{ disableUnderline: true }}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Время отправки:</label>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimePicker
+                label="Время"
+                value={formData.time ? dayjs(formData.time, 'HH:mm') : null}
+                onChange={handleTimeChange}
+                views={['hours', 'minutes']}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    className={styles.inputField}
+                    
+                    InputProps={{ disableUnderline: true }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </div>
 
           <div className={styles.addRouteButton}>
-            <IconButton>
+            <IconButton className={styles.addRoutePlus}>
               <AddIcon fontSize="large" color="primary" />
             </IconButton>
             <p>Нажмите +, чтобы добавить еще один маршрут поездки</p>
