@@ -44,6 +44,12 @@
   flex-direction: column;
   gap: 22.47px;
 
+  .routeGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 22.47px;
+  }
+
   .inputGroup {
     display: flex;
     flex-direction: column;

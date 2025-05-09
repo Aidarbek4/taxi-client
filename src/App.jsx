@@ -7,7 +7,6 @@ import './App.scss'
 import Welcome from './pages/Welcome/Welcome'
 import Request from './pages/Request/Request'
 import ClientDashboard from './pages/Client/ClientDashboard'
-import AddTrip from './pages/AddTrip/AddTrip'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -20,7 +19,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/client" element={<ClientDashboard />} />
         <Route path="/request" element={<Request />} />
-        <Route path="/add-trip" element={<AddTrip />} />
       </Routes>
     </div>
   )
