@@ -4,31 +4,39 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import styles from './Request.module.scss';
 
+// Extend dayjs with UTC and timezone plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const Request = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
 
-  // Debug: Log the received state
-  console.log('Received state in RequestForm:', state);
+  // console.log('Received state in Request:', state);
 
-  // Extract street names directly as strings
   const initialStart = state?.start || '';
   const initialEnd = state?.end || '';
-  const initialDate = state?.date ? (dayjs(state.date).isValid() ? dayjs(state.date).toDate() : null) : null;
-  const initialTime = state?.time || '';
+  const initialDate = state?.date ? (dayjs(state.date).isValid() ? dayjs(state.date).tz('Asia/Bishkek').toDate() : null) : null;
+  const initialTime = state?.time || null;
 
   const [formData, setFormData] = useState({
     purpose: '',
     date: initialDate,
     routes: [{ departure: initialStart, destination: initialEnd, time: initialTime }],
   });
+
+  useEffect(() => {
+    console.log('Initial formData:', formData);
+  }, []);
 
   const handleChange = (e, routeIndex = null) => {
     const { name, value } = e.target;
@@ -45,7 +53,7 @@ const Request = () => {
   };
 
   const handleDateChange = (newDate) => {
-    setFormData(prev => ({ ...prev, date: newDate?.toDate() || null }));
+    setFormData(prev => ({ ...prev, date: newDate ? newDate.tz('Asia/Bishkek').toDate() : null }));
   };
 
   const handleTimeChange = (newTime, routeIndex) => {
@@ -53,7 +61,7 @@ const Request = () => {
       ...prev,
       routes: prev.routes.map((route, index) =>
         index === routeIndex
-          ? { ...route, time: newTime?.format('HH:mm') || '' }
+          ? { ...route, time: newTime ? newTime.tz('Asia/Bishkek').format('HH:mm') : null }
           : route
       ),
     }));
@@ -62,7 +70,7 @@ const Request = () => {
   const handleAddRoute = () => {
     setFormData(prev => ({
       ...prev,
-      routes: [...prev.routes, { departure: '', destination: '', time: '' }],
+      routes: [...prev.routes, { departure: '', destination: '', time: null }],
     }));
   };
 
@@ -81,7 +89,7 @@ const Request = () => {
     }
     const formattedData = {
       ...formData,
-      date: formData.date ? dayjs(formData.date).format('YYYY-MM-DD') : null,
+      date: formData.date ? dayjs(formData.date).tz('Asia/Bishkek').format('YYYY-MM-DD') : null,
     };
     console.log('Submitted:', formattedData);
     navigate('/confirmation');
@@ -114,20 +122,19 @@ const Request = () => {
             <label className={styles.label}>Дата поездки:</label>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                value={formData.date ? dayjs(formData.date) : null}
+                value={formData.date ? dayjs(formData.date).tz('Asia/Bishkek') : null}
                 onChange={handleDateChange}
                 views={['year', 'month', 'day']}
                 format="YYYY-MM-DD"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    className={styles.inputField}
-                    placeholder="Выберите дату"
-                    margin="none"
-                    variant="outlined"
-                    required
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    className: styles.inputField,
+                    placeholder: "Выберите дату",
+                    margin: "none",
+                    variant: "outlined",
+                    required: true,
+                  },
+                }}
                 PopperProps={{
                   modifiers: [
                     {
@@ -156,7 +163,7 @@ const Request = () => {
                   className={styles.inputField}
                   placeholder="Откуда?"
                   name="departure"
-                  value={route.departure}
+                  value={route.departure || ''}
                   onChange={(e) => handleChange(e, index)}
                   fullWidth
                   margin="none"
@@ -171,7 +178,7 @@ const Request = () => {
                   className={styles.inputField}
                   placeholder="Куда?"
                   name="destination"
-                  value={route.destination}
+                  value={route.destination || ''}
                   onChange={(e) => handleChange(e, index)}
                   fullWidth
                   margin="none"
@@ -184,20 +191,18 @@ const Request = () => {
                 <label className={styles.label}>Время отправки:</label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <TimePicker
-                    value={route.time ? dayjs(route.time, 'HH:mm') : null}
+                    value={route.time ? dayjs(route.time, 'HH:mm').tz('Asia/Bishkek') : null}
                     onChange={(newTime) => handleTimeChange(newTime, index)}
                     views={['hours', 'minutes']}
                     ampm={false}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        className={styles.inputField}
-                        placeholder="Выберите время"
-                        margin="none"
-                        variant="outlined"
-                        required
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        className: styles.inputField,
+                        margin: "none",
+                        variant: "outlined",
+                        required: true,
+                      },
+                    }}
                     PopperProps={{
                       modifiers: [
                         {
