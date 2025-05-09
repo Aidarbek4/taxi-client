@@ -34,9 +34,9 @@ const Request = () => {
     routes: [{ departure: initialStart, destination: initialEnd, time: initialTime }],
   });
 
-  useEffect(() => {
-    console.log('Initial formData:', formData);
-  }, []);
+  // useEffect(() => {
+  //   console.log('Initial formData:', formData);
+  // }, []);
 
   const handleChange = (e, routeIndex = null) => {
     const { name, value } = e.target;

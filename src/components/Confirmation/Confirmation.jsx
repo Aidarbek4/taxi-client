@@ -10,7 +10,7 @@ const Confirmation = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate('/clientdashboard');
-    }, 8000); // 8 seconds
+    }, 5300); // 5.3 seconds
 
     return () => clearTimeout(timer);
   }, [navigate]);
