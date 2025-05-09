@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "../../components/styles.scss" as *;
+
+.container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 122px;
+    align-items: center;
+    gap: 30px;
+    height: 100vh;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 37px;
+    font-weight: 600;
+    color: $primary-blue;
+  }
+  
+  .checkIcon {
+    font-size: 125px !important;
+    color: $accent-green;
+  }
+  
+  .message {
+    font-size: 18px;
+    color: $text-dark;
+    max-width: 300px;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+  }
