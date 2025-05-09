@@ -61,7 +61,6 @@
       margin: 0;
     }
 
-    // Адаптивные стили для полей
     ::global(.MuiPickersInputBase-root),
     ::global(.MuiPickersOutlinedInput-root),
     ::global(.MuiOutlinedInput-root) {
@@ -94,17 +93,32 @@
 
         .MuiButtonBase-root {
           padding: 8px !important;
-        }
+          border-radius: 50% !important;
 
-        .MuiSvgIcon-root {
-          color: #98A4B8 !important;
-          font-size: 24px !important;
+          &:hover,
+          &:active,
+          &:focus {
+            background-color: rgba($accent-yellow, 0.2) !important;
+          }
+
+          .MuiSvgIcon-root {
+            color: #98A4B8 !important;
+            font-size: 24px !important;
+
+            &:hover,
+            &:active,
+            &:focus {
+              color: $accent-yellow !important;
+              fill: $accent-yellow !important;
+            }
+          }
         }
       }
 
       .MuiInputBase-input {
         color: #1a1a1a !important;
         font-size: 16px !important;
+        padding: 16px 14px !important;
         height: 24px !important;
         box-sizing: border-box;
 
@@ -119,12 +133,25 @@
       }
     }
 
-    // Фикс для placeholder в DatePicker/TimePicker
     ::global(.MuiPickersInputBase-root input::placeholder),
     ::global(.MuiPickersInputBase-root textarea::placeholder) {
       color: #98A4B8 !important;
       opacity: 1 !important;
     }
+  }
+
+  ::global(.MuiPickersPopper-root) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  ::global(.MuiPickersLayout-root) {
+    width: 100%;
+    min-width: 348px;
+    margin: 0 auto;
   }
 
   .addRouteButton {
@@ -175,13 +202,26 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-    width: 100% !important;
-    min-width: 348px !important;
+    width: 100%;
+    min-width: 348px;
     height: 56.32px;
     font-weight: 400;
 
     &:hover {
       background-color: color.adjust($primary-blue, $lightness: -10%);
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .requestForm {
+    .inputGroup .inputField,
+    .submitButton {
+      min-width: 100%;
+    }
+
+    .inputGroup .MuiInputBase-input {
+      font-size: 16px;
     }
   }
 }

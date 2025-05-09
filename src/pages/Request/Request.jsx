@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import styles from './Request.module.scss';
 
-const RequestForm = () => {
+const Request = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+
+  // Debug: Log the received state
+  console.log('Received state in RequestForm:', state);
+
+  // Extract street names directly as strings
+  const initialStart = state?.start || '';
+  const initialEnd = state?.end || '';
+  const initialDate = state?.date ? (dayjs(state.date).isValid() ? dayjs(state.date).toDate() : null) : null;
+  const initialTime = state?.time || '';
+
   const [formData, setFormData] = useState({
     purpose: '',
-    date: null,
-    routes: [{ departure: '', destination: '', time: '' }],
+    date: initialDate,
+    routes: [{ departure: initialStart, destination: initialEnd, time: initialTime }],
   });
 
   const handleChange = (e, routeIndex = null) => {
@@ -53,9 +66,25 @@ const RequestForm = () => {
     }));
   };
 
+  const isFormValid = () => {
+    if (!formData.purpose.trim() || !formData.date) return false;
+    return formData.routes.every(route => 
+      route.departure.trim() && route.destination.trim() && route.time
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitted:', formData);
+    if (!isFormValid()) {
+      alert('Please fill all fields before submitting.');
+      return;
+    }
+    const formattedData = {
+      ...formData,
+      date: formData.date ? dayjs(formData.date).format('YYYY-MM-DD') : null,
+    };
+    console.log('Submitted:', formattedData);
+    navigate('/confirmation');
   };
 
   return (
@@ -77,6 +106,7 @@ const RequestForm = () => {
               fullWidth
               margin="none"
               variant="outlined"
+              required
             />
           </div>
 
@@ -86,6 +116,8 @@ const RequestForm = () => {
               <DatePicker
                 value={formData.date ? dayjs(formData.date) : null}
                 onChange={handleDateChange}
+                views={['year', 'month', 'day']}
+                format="YYYY-MM-DD"
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -93,8 +125,25 @@ const RequestForm = () => {
                     placeholder="Выберите дату"
                     margin="none"
                     variant="outlined"
+                    required
                   />
                 )}
+                PopperProps={{
+                  modifiers: [
+                    {
+                      name: 'offset',
+                      options: {
+                        offset: [0, 10],
+                      },
+                    },
+                    {
+                      name: 'preventOverflow',
+                      options: {
+                        boundary: 'window',
+                      },
+                    },
+                  ],
+                }}
               />
             </LocalizationProvider>
           </div>
@@ -112,6 +161,7 @@ const RequestForm = () => {
                   fullWidth
                   margin="none"
                   variant="outlined"
+                  required
                 />
               </div>
 
@@ -126,6 +176,7 @@ const RequestForm = () => {
                   fullWidth
                   margin="none"
                   variant="outlined"
+                  required
                 />
               </div>
 
@@ -136,6 +187,7 @@ const RequestForm = () => {
                     value={route.time ? dayjs(route.time, 'HH:mm') : null}
                     onChange={(newTime) => handleTimeChange(newTime, index)}
                     views={['hours', 'minutes']}
+                    ampm={false}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -143,8 +195,25 @@ const RequestForm = () => {
                         placeholder="Выберите время"
                         margin="none"
                         variant="outlined"
+                        required
                       />
                     )}
+                    PopperProps={{
+                      modifiers: [
+                        {
+                          name: 'offset',
+                          options: {
+                            offset: [0, 10],
+                          },
+                        },
+                        {
+                          name: 'preventOverflow',
+                          options: {
+                            boundary: 'window',
+                          },
+                        },
+                      ],
+                    }}
                   />
                 </LocalizationProvider>
               </div>
@@ -163,6 +232,7 @@ const RequestForm = () => {
             className={styles.submitButton}
             variant="contained"
             fullWidth
+            disabled={!isFormValid()}
           >
             Подать заявку
           </Button>
@@ -172,4 +242,4 @@ const RequestForm = () => {
   );
 };
 
-export default RequestForm;
+export default Request;

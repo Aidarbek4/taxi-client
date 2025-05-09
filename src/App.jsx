@@ -7,6 +7,7 @@ import './App.scss'
 import Welcome from './pages/Welcome/Welcome'
 import Request from './pages/Request/Request'
 import ClientDashboard from './pages/Client/ClientDashboard'
+import Confirmation from './components/Confirmation/Confirmation'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/client" element={<ClientDashboard />} />
         <Route path="/request" element={<Request />} />
+        <Route path="/confirmation" element={<Confirmation />} />
       </Routes>
     </div>
   )
