@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
 import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs from 'dayjs';
 import styles from './Request.module.scss';
 
 const RequestForm = () => {
@@ -56,9 +55,7 @@ const RequestForm = () => {
               onChange={handleChange}
               fullWidth
               margin="none"
-              variant="standard"
-              border="none"
-              InputProps={{ disableUnderline: true }}
+              variant="outlined"
             />
           </div>
 
@@ -66,15 +63,15 @@ const RequestForm = () => {
             <label className={styles.label}>Дата поездки:</label>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Дата"
                 value={formData.date ? dayjs(formData.date) : null}
                 onChange={handleDateChange}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     className={styles.inputField}
-                  
-                    InputProps={{ disableUnderline: true }}
+                    placeholder="Выберите дату"
+                    margin="none"
+                    variant="outlined"
                   />
                 )}
               />
@@ -91,9 +88,7 @@ const RequestForm = () => {
               onChange={handleChange}
               fullWidth
               margin="none"
-              variant="standard"
-              border="none"
-              InputProps={{ disableUnderline: true }}
+              variant="outlined"
             />
           </div>
 
@@ -107,9 +102,7 @@ const RequestForm = () => {
               onChange={handleChange}
               fullWidth
               margin="none"
-              variant="standard"
-              border="none"
-              InputProps={{ disableUnderline: true }}
+              variant="outlined"
             />
           </div>
 
@@ -117,7 +110,6 @@ const RequestForm = () => {
             <label className={styles.label}>Время отправки:</label>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <TimePicker
-                label="Время"
                 value={formData.time ? dayjs(formData.time, 'HH:mm') : null}
                 onChange={handleTimeChange}
                 views={['hours', 'minutes']}
@@ -125,8 +117,9 @@ const RequestForm = () => {
                   <TextField
                     {...params}
                     className={styles.inputField}
-                    
-                    InputProps={{ disableUnderline: true }}
+                    placeholder="Выберите время"
+                    margin="none"
+                    variant="outlined"
                   />
                 )}
               />

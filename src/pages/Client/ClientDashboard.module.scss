@@ -1,6 +1,5 @@
 @use "sass:color";
-@import "../../components/styles.scss";
-
+@use "../../components/styles.scss" as *;
 .dashboard {
   display: flex;
   flex-direction: column;
