@@ -126,12 +126,14 @@ const Request = () => {
                 onChange={handleDateChange}
                 views={['year', 'month', 'day']}
                 format="YYYY-MM-DD"
+                minDate={dayjs().startOf('day')}
                 slotProps={{
                   textField: {
                     className: styles.inputField,
                     placeholder: "Выберите дату",
                     margin: "none",
                     variant: "outlined",
+                  
                     required: true,
                   },
                 }}
