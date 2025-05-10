@@ -38,18 +38,14 @@ function ClientDashboard() {
 
   const handleSubmit = () => {
     const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    if (start && end) {
-      // console.log('Manual navigation with locations:', convertedLocations);
-      navigate('/request', { state: { start: convertedLocations.start, end: convertedLocations.end, date: today, time: null } });
-    } else {
-      alert('Please select both start and end locations.');
-    }
+    // console.log('Manual navigation with locations:', convertedLocations);
+    navigate('/request', { state: { start: start, end: end, date: today, time: null } });
   };
 
   return (
     <div className={styles.dashboard}>
       <div className={styles.header}>
-        <button className={styles.submitButton} onClick={handleSubmit}>
+        <button className={styles.submitButton} onClick={handleSubmit} >
           ПОДАТЬ ЗАЯВКУ
         </button>
         <IconButton onClick={() => navigate('/profile')} className={styles.profileIcon}>
