@@ -2,18 +2,27 @@ import React, { useEffect } from 'react';
 import { Typography, Box } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styles from './Confirmation.module.scss';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Confirmation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const confirmedData = location.state?.confirmedData || {
+    purpose: 'Поездка в университет',
+    date: new Date().toISOString().split('T')[0],
+    routes: [
+      { departure: 'Пункт А', destination: 'Пункт Б', time: '10:00' },
+    ],
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/client');
-    }, 5300); // 5.3 seconds
+      navigate('/client', { state: { confirmedData } });
+    }, 5300);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, confirmedData]);
 
   return (
     <div className={styles.container}>
