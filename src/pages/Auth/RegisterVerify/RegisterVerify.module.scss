@@ -1,0 +1,57 @@
+// RegisterVerify.module.scss
+.RegisterVerify {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+.VerifyWrapper {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.VerifyTitle {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.VerifyForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.VerifyInput {
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.VerifyButton {
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.VerifyButton:hover {
+  background-color: #0056b3;
+}
+
+.VerifyError {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
