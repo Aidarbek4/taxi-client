@@ -1,6 +1,6 @@
 // RegisterVerify.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './RegisterVerify.module.scss';
 
@@ -22,7 +22,7 @@ function RegisterVerify() {
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/verify/', {
+      await axios.post('http://localhost:8000/api/confirm/', {
         email,
         code,
       });
@@ -35,7 +35,7 @@ function RegisterVerify() {
   };
 
   return (
-    <div className={styles.RegisterVerify}>
+    <div className={styles.Verify}>
       <div className={styles.VerifyWrapper}>
         <h1 className={styles.VerifyTitle}>Verify Your Email</h1>
         <form className={styles.VerifyForm} onSubmit={handleVerify}>
@@ -49,6 +49,9 @@ function RegisterVerify() {
           {error && <div className={styles.VerifyError}>{error}</div>}
           <button type="submit" className={styles.VerifyButton}>Verify</button>
         </form>
+        <div className={styles.VerifyCancel}>
+          <Link to="/register">Cancel</Link>
+        </div>
       </div>
     </div>
   );

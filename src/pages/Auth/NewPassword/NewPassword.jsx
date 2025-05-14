@@ -4,40 +4,85 @@ import styles from './NewPassword.module.scss';
 
 function NewPassword() {
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleNewPassword = (e) => {
+  const handleNewPassword = async (e) => {
     e.preventDefault();
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+      setError('Password must be at least 6 characters long');
       return;
     }
 
-    // TODO: отправить новый пароль на сервер с email
-    const email = localStorage.getItem('resetEmail');
-    // await updatePassword(email, password);
+    if (!code.trim()) {
+      setError('Please enter the verification code');
+      return;
+    }
 
-    alert('Password changed successfully!');
-    localStorage.removeItem('resetEmail');
-    navigate('/');
+    const email = localStorage.getItem('resetEmail');
+    if (!email) {
+      setError('Email not found. Please try password recovery again.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:8000/api/reset-password/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          code,
+          new_password: password
+        })
+      });
+
+      if (response.ok) {
+        alert('Password changed successfully!');
+        localStorage.removeItem('resetEmail');
+        navigate('/');
+      } else {
+        const data = await response.json();
+        setError(data?.detail || 'Failed to change password');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Server unavailable');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className={styles.Login}>
-      <div className={styles.LoginWrapper}>
-        <h1 className={styles.LoginTitle}>Create New Password</h1>
-        <form className={styles.LoginForm} onSubmit={handleNewPassword}>
+    <div className={styles.NewPassword}>
+      <div className={styles.NewPasswordWrapper}>
+        <h1 className={styles.NewPasswordTitle}>Create New Password</h1>
+        <form className={styles.NewPasswordForm} onSubmit={handleNewPassword}>
+          <input
+            type="text"
+            placeholder="Verification code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className={styles.NewPasswordInput}
+          />
           <input
             type="password"
             placeholder="New password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={styles.LoginInput}
+            className={styles.NewPasswordInput}
           />
-          {error && <p className={styles.Error}>{error}</p>}
-          <button className={styles.LoginButton}>Change Password</button>
+          {error && <p className={styles.NewPasswordError}>{error}</p>}
+          <button className={styles.NewPasswordButton} disabled={loading}>
+            {loading ? 'Submitting...' : 'Change Password'}
+          </button>
         </form>
       </div>
     </div>

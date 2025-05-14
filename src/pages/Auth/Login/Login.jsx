@@ -19,12 +19,20 @@ function Login() {
         password
       });
 
-      localStorage.setItem('userData', JSON.stringify(response.data));
+      // Пример: разбиваем ответ на поля и сохраняем их по отдельности
+      const { id, email: userEmail, name, role } = response.data;
+
+      localStorage.setItem('id', id);
+      localStorage.setItem('email', userEmail);
+      localStorage.setItem('name', name);
+      localStorage.setItem('role', role);
+
       navigate('/');
     } catch (err) {
       setError('Invalid credentials or unverified email');
     }
   };
+
 
   return (
     <div className={styles.Login}>
