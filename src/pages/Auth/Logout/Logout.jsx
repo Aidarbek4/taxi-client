@@ -5,10 +5,10 @@ function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.removeItem('id');
-    localStorage.removeItem('name');
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
 
     navigate('/login');
   }, [navigate]);

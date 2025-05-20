@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NearMeIcon from '@mui/icons-material/NearMe';
-import ClearIcon from '@mui/icons-material/Clear'; // иконка крестика
+import ClearIcon from '@mui/icons-material/Clear';
 import styles from './LocationInputs.module.scss';
 
-function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting }) {
+function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting, setDeparture, setDestination }) {
   const [queries, setQueries] = useState({ start: '', end: '' });
   const [suggestions, setSuggestions] = useState({ start: [], end: [] });
   const [dropdownsOpen, setDropdownsOpen] = useState({ start: false, end: false });
@@ -31,9 +31,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -43,21 +41,27 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
       }
     };
     document.addEventListener('keydown', handleEsc);
-    return () => {
-      document.removeEventListener('keydown', handleEsc);
-    };
+    return () => document.removeEventListener('keydown', handleEsc);
   }, []);
 
   const reverseGeocode = async (lat, lng, type) => {
     try {
       const { data } = await axios.get('https://nominatim.openstreetmap.org/reverse', {
-        params: { lat, lon: lng, format: 'json' },
+        params: { lat, lon: lng, format: 'json', addressdetails: 1 },
       });
+
       if (data?.display_name) {
         setQueries((q) => ({ ...q, [type]: data.display_name }));
       } else {
         setQueries((q) => ({ ...q, [type]: `${lat.toFixed(6)}, ${lng.toFixed(6)}` }));
       }
+
+      const address = data?.address;
+      const city = address?.city || address?.town || address?.village || address?.hamlet || '';
+
+      if (type === 'start' && setDeparture) setDeparture(data.display_name);
+      if (type === 'end' && setDestination) setDestination(data.display_name);
+
     } catch (error) {
       console.error('Ошибка при обратном геокодировании:', error);
       setQueries((q) => ({ ...q, [type]: `${lat.toFixed(6)}, ${lng.toFixed(6)}` }));
@@ -69,6 +73,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
       setSuggestions((s) => ({ ...s, [type]: [] }));
       return;
     }
+
     try {
       const { data } = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: { q: query, format: 'json', addressdetails: 1, limit: 5 },
@@ -97,12 +102,19 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
 
     try {
       const { data } = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: { q: query, format: 'json', limit: 1 },
+        params: { q: query, format: 'json', limit: 1, addressdetails: 1 },
       });
+
       if (data.length > 0) {
         const place = data[0];
         setter({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
         querySetter(place.display_name);
+
+        const address = place.address;
+        const city = address?.city || address?.town || address?.village || address?.hamlet || '';
+
+        if (type === 'start' && setDeparture) setDeparture(place.display_name);
+        if (type === 'end' && setDestination) setDestination(place.display_name);
       }
     } catch (err) {
       console.error('Ошибка при поиске местоположения:', err);
@@ -126,8 +138,13 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
 
   const handleClear = (type) => {
     setQueries((q) => ({ ...q, [type]: '' }));
-    if (type === 'start') setStart(null);
-    else setEnd(null);
+    if (type === 'start') {
+      setStart(null);
+      setDeparture('');
+    } else {
+      setEnd(null);
+      setDestination('');
+    }
     setSuggestions((s) => ({ ...s, [type]: [] }));
     setDropdownsOpen((d) => ({ ...d, [type]: false }));
   };
@@ -136,6 +153,13 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
     const setter = type === 'start' ? setStart : setEnd;
     setter({ lat: parseFloat(suggestion.lat), lng: parseFloat(suggestion.lon) });
     setQueries((q) => ({ ...q, [type]: suggestion.display_name }));
+
+    const address = suggestion.address;
+    const city = address?.city || address?.town || address?.village || address?.hamlet || '';
+
+    if (type === 'start' && setDeparture) setDeparture(suggestion.display_name);
+    if (type === 'end' && setDestination) setDestination(suggestion.display_name);
+
     setSuggestions((s) => ({ ...s, [type]: [] }));
     setDropdownsOpen((d) => ({ ...d, [type]: false }));
   };
@@ -169,8 +193,7 @@ function LocationInputs({ start, setStart, end, setEnd, selecting, setSelecting 
           <div className={styles.InputWrapper}>
             <input
               type="text"
-              placeholder={type === 'start' ? 'Откуда' : 'Куда'
-              }
+              placeholder={type === 'start' ? 'Откуда' : 'Куда'}
               value={queries[type]}
               onChange={(e) => handleInputChange(e, type)}
               onKeyDown={(e) => handleKeyDown(e, type)}

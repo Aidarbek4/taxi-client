@@ -3,11 +3,15 @@ import Map from '../../components/Map/Map';
 import LocationInputs from '../../components/LocationInputs/LocationInputs';
 import styles from './Home.module.scss';
 import Navbar from '../../components/Navbar/Navbar';
+import RequestForm from '../../components/RequestForm/RequestForm';
+import TripInfo from '../../components/TripInfo/TripInfo';
 
 function Home() {
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [selecting, setSelecting] = useState(null);
+
+  let requestId = localStorage.getItem('requestId');
 
   return (
     <div className={styles.Home}>
@@ -20,7 +24,7 @@ function Home() {
         setSelecting={setSelecting}
       />
       <Navbar />
-      <LocationInputs
+      <RequestForm 
         start={start}
         setStart={setStart}
         end={end}
@@ -28,6 +32,7 @@ function Home() {
         selecting={selecting}
         setSelecting={setSelecting}
       />
+      {requestId && <TripInfo />}
     </div>
   );
 }

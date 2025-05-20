@@ -8,13 +8,14 @@ import ResetPassword from './pages/Auth/ResetPassword/ResetPassword';
 import NewPassword from './pages/Auth/NewPassword/NewPassword';
 import RegisterVerify from './pages/Auth/RegisterVerify/RegisterVerify';
 import Logout from './pages/Auth/Logout/Logout';
+import Profile from './pages/Profile/Profile';
 import './App.scss';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('id');
+    const token = localStorage.getItem('userId');
     setIsAuthenticated(!!token);
   }, []);
 
@@ -22,12 +23,15 @@ function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={isAuthenticated ? <Home /> : <Welcome />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
         <Route path="/register-verify" element={<RegisterVerify />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/new-password" element={<NewPassword />} />
+
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   );

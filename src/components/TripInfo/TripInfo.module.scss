@@ -1,0 +1,47 @@
+.TripInfo {
+  position: absolute;
+  right: 20px;
+  top: 120px;
+  z-index: 5;
+  width: 300px;
+  background-color: #007bff;
+  padding: 15px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0px 4px 10px rgba(217, 208, 208, 0.3);
+
+  &Title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+  }
+
+  &Container {
+    background-color: #fff;
+    padding: 5px 10px;
+    border-radius: 10px;
+
+    &+& {
+      margin-top: 10px;
+    }
+  }
+
+  &Item {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    padding: 5px 0;
+    gap: 20px;
+
+    &Label {
+      font-weight: bold;
+    }
+
+    &+& {
+      border-top: 1px solid #007bff;
+    }
+  }
+}

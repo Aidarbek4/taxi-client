@@ -22,10 +22,10 @@ function Login() {
       // Пример: разбиваем ответ на поля и сохраняем их по отдельности
       const { id, email: userEmail, name, role } = response.data;
 
-      localStorage.setItem('id', id);
-      localStorage.setItem('email', userEmail);
-      localStorage.setItem('name', name);
-      localStorage.setItem('role', role);
+      localStorage.setItem('userId', id);
+      localStorage.setItem('userEmail', userEmail);
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userRole', role);
 
       navigate('/');
     } catch (err) {
